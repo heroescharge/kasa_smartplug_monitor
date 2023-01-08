@@ -1,42 +1,40 @@
 from kasa import *
 import asyncio
 from matplotlib import pyplot as plt
-import matplotlib.dates as mpl_dates
 from datetime import datetime
-import time
-import threading
+
 
 plug = SmartPlug("192.168.86.245")
 # asyncio.run(plug.update())
-# print(plug.emeter_realtime["voltage"])
+# print(plug.emeter_realtime["power"])
 
 MAX_LEN = 200
 UPDATE_INTERVAL_SEC = 3
 times = []
-voltages = []
+powers = []
 
-def add_voltage(arr_time, arr_voltage, time, voltage):
-    if (len(arr_voltage) >= MAX_LEN):
+def add_power(arr_time, arr_power, time, power):
+    if (len(arr_power) >= MAX_LEN):
         arr_time.pop(0)
-        arr_voltage.pop(0)
+        arr_power.pop(0)
     arr_time.append(time)
-    arr_voltage.append(voltage)
+    arr_power.append(power)
 
 async def update_graph():
     while True:
-        plt.plot(times, voltages)
+        plt.plot(times, powers)
         plt.gcf().autofmt_xdate()
         plt.show(block = False)
         plt.pause(0.1)
 
-        await update_voltage()
+        await update_power()
         await asyncio.sleep(UPDATE_INTERVAL_SEC)
 
-async def update_voltage():
+async def update_power():
     await plug.update()
     current_time = datetime.now()
-    current_voltage = plug.emeter_realtime["power"]
-    add_voltage(times, voltages, current_time, current_voltage)
+    current_power = plug.emeter_realtime["power"]
+    add_power(times, powers, current_time, current_power)
         
 
 if __name__ == "__main__":
